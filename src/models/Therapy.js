@@ -34,9 +34,13 @@ const therapySchema = new mongoose.Schema(
         default:0
     },
 
+    usedIn:{
+        type:String,
+        default:""
+    },
+
     status:{
         type:String,
-        enum:["Active","Offline"],
         default:"Active"
     }
 },
