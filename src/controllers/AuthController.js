@@ -31,9 +31,9 @@ export const registerAdmin = async (req, res) => {
         // 🍪 SEND TOKEN IN COOKIE
         res.cookie("token", token, {
             httpOnly: true,
-            secure: false, // true in production (HTTPS)
-            sameSite: "lax",
-            maxAge: 7 * 24 * 60 * 60 * 1000 // 1 day
+            secure: true,       // Required for cross-origin cookies (HTTPS)
+            sameSite: "none",   // Required for cross-origin cookies (different domains)
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
         res.status(201).json({
@@ -89,9 +89,9 @@ export const loginAdmin = async (req, res) => {
         // 4. send token in cookie 🍪
         res.cookie("token", token, {
             httpOnly: true,
-            secure: false, // true in production (HTTPS)
-            sameSite: "lax",
-            maxAge: 7 * 24 * 60 * 60 * 1000 // 1 day
+            secure: true,       // Required for cross-origin cookies (HTTPS)
+            sameSite: "none",   // Required for cross-origin cookies (different domains)
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
         // 5. response
@@ -142,6 +142,8 @@ export const logoutAdmin = async (req, res) => {
     try {
         res.cookie("token", "", {
             httpOnly: true,
+            secure: true,
+            sameSite: "none",
             expires: new Date(0) // instantly expire cookie
         });
 
