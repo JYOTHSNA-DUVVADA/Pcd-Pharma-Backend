@@ -31,8 +31,8 @@ export const registerAdmin = async (req, res) => {
         // 🍪 SEND TOKEN IN COOKIE
         res.cookie("token", token, {
             httpOnly: true,
-            secure: true,       // Required for cross-origin cookies (HTTPS)
-            sameSite: "none",   // Required for cross-origin cookies (different domains)
+            secure: process.env.NODE_ENV === "production", // true in prod (HTTPS)
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // none in prod, lax in dev
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
@@ -89,8 +89,8 @@ export const loginAdmin = async (req, res) => {
         // 4. send token in cookie 🍪
         res.cookie("token", token, {
             httpOnly: true,
-            secure: true,       // Required for cross-origin cookies (HTTPS)
-            sameSite: "none",   // Required for cross-origin cookies (different domains)
+            secure: process.env.NODE_ENV === "production", // true in prod (HTTPS)
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // none in prod, lax in dev
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
@@ -142,8 +142,8 @@ export const logoutAdmin = async (req, res) => {
     try {
         res.cookie("token", "", {
             httpOnly: true,
-            secure: true,
-            sameSite: "none",
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             expires: new Date(0) // instantly expire cookie
         });
 
