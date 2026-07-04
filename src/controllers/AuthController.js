@@ -2,6 +2,17 @@ import Admin from "../models/Admin.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+// Detect production based on CLIENT_URL env var (reliable on Render without needing NODE_ENV set)
+const isProduction = () => process.env.CLIENT_URL?.startsWith("https://");
+
+// Shared cookie options factory
+const cookieOptions = () => ({
+    httpOnly: true,
+    secure: isProduction(),
+    sameSite: isProduction() ? "none" : "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+});
+
 export const registerAdmin = async (req, res) => {
     try {
         const { user_id, password } = req.body;
@@ -25,16 +36,10 @@ export const registerAdmin = async (req, res) => {
         const token = jwt.sign(
             { id: admin._id },
             process.env.JWT_SECRET,
-            { expiresIn: "1d" }
+            { expiresIn: "7d" } // Matches cookie maxAge
         );
 
-        // 🍪 SEND TOKEN IN COOKIE
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production", // true in prod (HTTPS)
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // none in prod, lax in dev
-            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-        });
+        res.cookie("token", token, cookieOptions());
 
         res.status(201).json({
             success: true,
@@ -55,7 +60,7 @@ export const loginAdmin = async (req, res) => {
     try {
         const { user_id, password } = req.body;
 
-        // 1. check if admin exists
+        // 1. Check if admin exists
         const admin = await Admin.findOne({ user_id });
 
         if (!admin) {
@@ -65,7 +70,7 @@ export const loginAdmin = async (req, res) => {
             });
         }
 
-        // 2. compare password
+        // 2. Compare password
         const isMatch = await bcrypt.compare(password, admin.password);
 
         if (!isMatch) {
@@ -75,26 +80,17 @@ export const loginAdmin = async (req, res) => {
             });
         }
 
-        // 3. create JWT token
+        // 3. Create JWT token (7d — must match cookie maxAge)
         const token = jwt.sign(
-            {
-                id: admin._id
-            },
+            { id: admin._id },
             process.env.JWT_SECRET,
-            {
-                expiresIn: "1d"
-            }
+            { expiresIn: "7d" }
         );
 
-        // 4. send token in cookie 🍪
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production", // true in prod (HTTPS)
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // none in prod, lax in dev
-            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-        });
+        // 4. Send token in cookie
+        res.cookie("token", token, cookieOptions());
 
-        // 5. response
+        // 5. Response
         res.status(200).json({
             success: true,
             message: "Login successful"
@@ -112,7 +108,6 @@ export const loginAdmin = async (req, res) => {
 
 export const getAdmin = async (req, res) => {
     try {
-        // req.admin comes from middleware (JWT decoded)
         const adminId = req.admin?.id;
 
         const admin = await Admin.findById(adminId).select("-password");
@@ -142,9 +137,9 @@ export const logoutAdmin = async (req, res) => {
     try {
         res.cookie("token", "", {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-            expires: new Date(0) // instantly expire cookie
+            secure: isProduction(),
+            sameSite: isProduction() ? "none" : "lax",
+            expires: new Date(0) // Expire immediately
         });
 
         res.status(200).json({

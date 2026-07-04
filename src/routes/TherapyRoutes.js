@@ -1,6 +1,6 @@
 import express from "express";
 import { createTherapy, deleteTherapy, listTherapies, updateTherapy } from "../controllers/TherapyController.js";
-import { protect } from "../middleware/authMiddleware..js";
+import { protect } from "../middleware/authMiddleware.js";
 
 const therapyrouter = express.Router();
 

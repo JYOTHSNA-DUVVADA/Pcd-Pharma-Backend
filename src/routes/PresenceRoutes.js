@@ -1,6 +1,6 @@
 import express from "express";
 import { createPresence, deletePresence, listPresences, updatePresence } from "../controllers/PresenceController.js";
-import { protect } from "../middleware/authMiddleware..js";
+import { protect } from "../middleware/authMiddleware.js";
 
 const presencerouter = express.Router();
 
