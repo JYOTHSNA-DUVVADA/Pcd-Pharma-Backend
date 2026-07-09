@@ -1,3 +1,4 @@
+import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
@@ -6,6 +7,9 @@ import authrouter from "./src/routes/authroutes.js";
 import regionrouter from "./src/routes/RegionRoutes.js";
 import therapyrouter from "./src/routes/TherapyRoutes.js";
 import presencerouter from "./src/routes/PresenceRoutes.js";
+import networkrouter from "./src/routes/NetworkRoutes.js";
+
+dotenv.config();
 
 const app = express();
 
@@ -30,6 +34,7 @@ app.use('/auth', authrouter);
 app.use('/region', regionrouter);
 app.use('/therapy', therapyrouter);
 app.use('/presence', presencerouter);
+app.use('/network', networkrouter);
 
 // Health check
 app.get("/", (req, res) => {

@@ -3,12 +3,13 @@ import Admin from "../models/Admin.js";
 import Region from "../models/Region.js";
 import Therapy from "../models/Therapy.js";
 import Presence from "../models/Presence.js";
+import Network from "../models/Network.js";
 import bcrypt from "bcryptjs";
 
 const connectDB = async () => {
     try {
         const conn = await mongoose.connect(process.env.MONGO_URI);
-        console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+        console.log(`` + `✅ MongoDB Connected: ${conn.connection.host}`);
 
         // Seed default admin
         const adminExists = await Admin.findOne({ user_id: "admin" });
@@ -62,6 +63,24 @@ const connectDB = async () => {
                 { name: "Kolkata",    state: "West Bengal", region: "East Region",  partners: 9,  therapies: ["Gastro", "Multivitamins", "Dermatology"],       isHq: false, status: "Active" }
             ]);
             console.log("🏙️ Initial presences seeded successfully.");
+        }
+
+        // Seed initial network partners
+        const networkCount = await Network.countDocuments();
+        if (networkCount === 0) {
+            await Network.insertMany([
+                { name: "LifeMed Pharma", type: "Stockist", contactPerson: "Rajesh Sharma", contactRole: "Manager", phone: "9876543210", therapy: "Cardio", region: "North Region", dateSinceActive: "2024-05-12", status: "Active" },
+                { name: "HealthPlus Distributors", type: "Stockist", contactPerson: "Amit Verma", contactRole: "Owner", phone: "9876543211", therapy: "Respiratory", region: "North Region", dateSinceActive: "2024-06-18", status: "Active" },
+                { name: "Wellness Medicos", type: "Stockist", contactPerson: "Neha Gupta", contactRole: "Sales Head", phone: "9876543212", therapy: "Cardio", region: "South Region", dateSinceActive: "2024-08-01", status: "Active" },
+                { name: "CareMax Distributors", type: "Stockist", contactPerson: "Sandeep Rao", contactRole: "Proprietor", phone: "9876543213", therapy: "Dermatology", region: "West Region", dateSinceActive: "2025-01-20", status: "Active" },
+                { name: "Global Pharma Supply", type: "Stockist", contactPerson: "Vikram Singh", contactRole: "Manager", phone: "9876543214", therapy: "Neurology", region: "East Region", dateSinceActive: "2025-02-14", status: "Inactive" },
+                { name: "PrimeCare Distributors", type: "Stockist", contactPerson: "Pooja Mehta", contactRole: "Owner", phone: "9876543215", therapy: "Cardio", region: "South Region", dateSinceActive: "2025-03-05", status: "Active" },
+                { name: "Apex Medicare", type: "Retailer", contactPerson: "Anil Kumar", contactRole: "Manager", phone: "9876543216", therapy: "Respiratory", region: "North Region", dateSinceActive: "2025-03-10", status: "Active" },
+                { name: "Sunshine Pharmacy", type: "Retailer", contactPerson: "Priya Sharma", contactRole: "Owner", phone: "9876543217", therapy: "Dermatology", region: "West Region", dateSinceActive: "2025-04-12", status: "Active" },
+                { name: "City Chemists", type: "Retailer", contactPerson: "Rahul Verma", contactRole: "Pharmacist", phone: "9876543218", therapy: "Neurology", region: "South Region", dateSinceActive: "2025-05-01", status: "Inactive" },
+                { name: "CureAll Meds", type: "Retailer", contactPerson: "John Doe", contactRole: "Manager", phone: "9876543219", therapy: "Cardio", region: "Central Region", dateSinceActive: "2025-05-18", status: "Active" }
+            ]);
+            console.log("🤝 Initial network partners seeded successfully.");
         }
 
     } catch (error) {

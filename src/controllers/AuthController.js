@@ -2,8 +2,10 @@ import Admin from "../models/Admin.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-// Detect production based on CLIENT_URL env var (reliable on Render without needing NODE_ENV set)
-const isProduction = () => process.env.CLIENT_URL?.startsWith("https://");
+// Detect production: checks NODE_ENV first, falls back to CLIENT_URL
+const isProduction = () =>
+  process.env.NODE_ENV === "production" ||
+  process.env.CLIENT_URL?.startsWith("https://");
 
 // Shared cookie options factory
 const cookieOptions = () => ({
@@ -87,13 +89,14 @@ export const loginAdmin = async (req, res) => {
             { expiresIn: "7d" }
         );
 
-        // 4. Send token in cookie
+        // 4. Send token in cookie + response body
         res.cookie("token", token, cookieOptions());
 
         // 5. Response
         res.status(200).json({
             success: true,
-            message: "Login successful"
+            message: "Login successful",
+            token
         });
 
     } catch (error) {

@@ -7,6 +7,7 @@ import Region from "./src/models/Region.js";
 import Therapy from "./src/models/Therapy.js";
 import Presence from "./src/models/Presence.js";
 import Admin from "./src/models/Admin.js";
+import Network from "./src/models/Network.js";
 
 dotenv.config();
 
@@ -20,12 +21,14 @@ const check = async () => {
         const regions = await Region.countDocuments();
         const therapies = await Therapy.countDocuments();
         const presences = await Presence.countDocuments();
+        const networks = await Network.countDocuments();
 
         console.log("STATS:");
         console.log("- Admins:", admins);
         console.log("- Regions:", regions);
         console.log("- Therapies:", therapies);
         console.log("- Presences:", presences);
+        console.log("- Networks:", networks);
 
         const sampleRegions = await Region.find().limit(2);
         console.log("Sample Regions:", JSON.stringify(sampleRegions, null, 2));
